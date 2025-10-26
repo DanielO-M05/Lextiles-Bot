@@ -9,6 +9,7 @@ from wordfreq import zipf_frequency
 
 # TODO: Make this whole thing a class
 # TODO: Format to docstrings
+# TODO: variables snake case and functions camel case?
 
 WORD_POPULARITY = 1.5
 
@@ -45,16 +46,72 @@ powerups = [
     # It's not an easy calculation, but I want to say that brute force has many millions of possible paths
     # This is reduced because not all paths are words, but either way it still takes too long
 
+def solve():
+    print(letters)
+    coords = best_move()
+
+    while coords != []:
+        print(coords)
+        print(word_from_coords(coords))
+        print()
+
+        update_board(coords)
+
+        print(letters)
+
+        coords = best_move()
+
+def update_board(coords):
+
+    for i in range(6):
+        for j in range(6):
+            if (i,j) in coords:
+                letters[i][j] = ""
+
+    print("before collapse")
+    print(letters)
+
+    collapse_down()
+    collapse_right()
+
+def collapse_down():
+    for i in range(len(letters[0])):
+        new_col = []
+
+        for j in range(6):
+            if letters[5-j][i] != "":
+                new_col.append(letters[5-j][i])
+
+        # Put new col in bottom
+        for j in range(len(new_col)): # TODO change magic number 6 into ROW
+            letters[5-j][i] = new_col[j]
+
+        # Put blanks on top:
+        for j in range(6-len(new_col)):
+            letters[j][i] = ""
+
+def collapse_right(): # TODO: all the const stuff + idk if this is right
+    for i in range(5, 0, -1): # TODO: 5 = COL - 1
+        offset = 0
+        while letters[5][i-offset] == "":
+            offset += 1
+
+        for i in range(6-offset):
+            for j in range(6):
+                letters[j][5-i] = letters[j][5-offset-i]
+
+    # Upate i in special manner?
+    
+
+
 # Description: finds the best word on the board
 # Params: none
 # Returns: the coordinate sequence (arr[tuple(x,y)]) of the best word
-def best():
+def best_move():
     max_score = -1
     max_coords_found = []
     for i in range(len(letters)):
         for j in range(len(letters[i])):
-            # We assume there is at least one valid powerup for our heuristic
-            # if letters[i][j] == "" or powerups[i][j] == "": continue
             if letters[i][j] == "": continue
 
             coords = max_coords([(i,j)], i, j)
@@ -76,6 +133,7 @@ def max_coords(coords, i, j):
         cur_word_coords = coords
 
     if not is_prefix(word_from_coords(coords)):
+        if word_from_coords(coords) == "thump": print("bruhhhh")
         return cur_word_coords
     else: # Check if the word can be extended
         for i_off in range(-1, 2):
@@ -83,9 +141,8 @@ def max_coords(coords, i, j):
                 x, y = i + i_off, j + j_off
 
                 # Make sure path is valid
-                if not in_bounds(x, y) or (x,y) in coords: continue
+                if not in_bounds(x, y) or (x,y) in coords or letters[x][y] == "" : continue
                 t_word = word_from_coords(coords) + letters[x][y]
-                if not is_prefix(t_word): continue
 
                 if is_prefix(t_word) or is_word(t_word):
                     t_coords = coords + [(x,y)]
@@ -120,11 +177,16 @@ def word_from_coords(coords):
 # Params: coordinate sequence
 # Returns: The score of the word formed by the sequence
 def score(coords):
+    if coords == []: return 0
+
     score = 0
     multiplier = 1
 
     for i in range(len(coords)):
         x, y = coords[i]
+
+        # HACK
+        if letters[x][y] == "": return 0
 
         score += scores[letters[x][y]]
 
@@ -146,6 +208,8 @@ def score(coords):
         
     return score * multiplier
 
-coords = best()
-print(coords)
-print(word_from_coords(coords))
+# coords = best_move()
+# print(coords)
+# print(word_from_coords(coords))
+
+solve()
