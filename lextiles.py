@@ -59,9 +59,9 @@ def best():
 
             coords = max_coords([(i,j)], i, j)
 
-            if score(word_from_coords(coords)) > max_score:
+            if score(coords) > max_score:
                 max_coords_found = coords
-                max_score = score(word_from_coords(coords))
+                max_score = score(coords)
 
     return max_coords_found
       
@@ -91,7 +91,7 @@ def max_coords(coords, i, j):
                     t_coords = coords + [(x,y)]
                     p_coords = max_coords(t_coords, x, y)
 
-                    if score(word_from_coords(p_coords)) > score(word_from_coords(cur_word_coords)):
+                    if score(p_coords) > score(cur_word_coords):
                         cur_word_coords = p_coords
 
     return cur_word_coords
@@ -117,14 +117,34 @@ def word_from_coords(coords):
     return word
 
 # TODO: this function is wrong, because it **needs** to take in coords, not words, because powerups need coords
-# Params: a string
-# Returns: The score of the word
-def score(word):
+# Params: coordinate sequence
+# Returns: The score of the word formed by the sequence
+def score(coords):
     score = 0
-    for i in range(len(word)):
-        score += scores[word[i]]
+    multiplier = 1
 
-    return score
+    for i in range(len(coords)):
+        x, y = coords[i]
+
+        score += scores[letters[x][y]]
+
+        # Check for powerup
+        if powerups[x][y] == "ds":
+            score *= 2
+        elif powerups[x][y] == "ts":
+            score *= 3
+        elif powerups[x][y] == "dw":
+            multiplier *= 2
+        elif powerups[x][y] == "tw":
+            multiplier *= 3
+        elif powerups[x][y] == "5":
+            score += 5
+        elif powerups[x][y] == "10":
+            score += 10
+        elif powerups[x][y] == "15":
+            score += 15
+        
+    return score * multiplier
 
 coords = best()
 print(coords)
