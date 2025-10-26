@@ -7,7 +7,8 @@ from english_prefix_trie import is_prefix
 
 from wordfreq import zipf_frequency
 
-# Make this whole thing a class
+# TODO: Make this whole thing a class
+# TODO: Format to docstrings
 
 WORD_POPULARITY = 1.5
 
