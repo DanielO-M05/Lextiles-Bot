@@ -10,6 +10,7 @@ from wordfreq import zipf_frequency
 # TODO: Make this whole thing a class
 # TODO: Format to docstrings
 # TODO: variables snake case and functions camel case?
+# TODO: make trie from wordfreq and not nltk for consistency
 
 WORD_POPULARITY = 1.5
 
