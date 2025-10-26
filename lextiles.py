@@ -3,9 +3,10 @@ A Lextiles Solver
 Author: Daniel Otto-Manzano
 '''
 
-from english_prefix_trie import is_prefix
+from english_prefix_trie import is_prefix, is_word
 
 from wordfreq import zipf_frequency
+import time
 
 # TODO: Make this whole thing a class
 # TODO: Format to docstrings
@@ -13,6 +14,10 @@ from wordfreq import zipf_frequency
 # TODO: make trie from wordfreq and not nltk for consistency
 
 WORD_POPULARITY = 2.5
+
+# .07 and 7 are pretty good times, speeding up for debugging
+CHAR_TIME = .03
+STR_TIME = .3
 
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
@@ -37,7 +42,7 @@ powerups = [
     ["", "tw", "", "", "", ""],
     ["", "", "", "ds", "", "10"],
     ["", "", "", "", "5", ""],
-    ["", "", "dl", "", "", ""],
+    ["", "", "", "", "", ""],
     ["", "", "dl", "", "", ""]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
@@ -47,6 +52,46 @@ powerups = [
     # It's not an easy calculation, but I want to say that brute force has many millions of possible paths
     # This is reduced because not all paths are words, but either way it still takes too long
 
+# Let's the bot have a word with you
+def talk():
+    typewrite_print("Hello, and welcome to the Lextiles Bot interface!", CHAR_TIME, STR_TIME)
+    typewrite_print("It appears that I've already been given the board state.", CHAR_TIME, STR_TIME)
+    typewrite_print("Let's go!", CHAR_TIME, STR_TIME)
+    print()
+
+    avoid = []
+    coords = [(-1,-1)] # HACK Placeholder so as not to trigger the while loop
+
+    while coords != []:
+
+        grid_print(letters)
+        coords = best_move(avoid=avoid)
+        print(coords)
+        typewrite_print("play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".", CHAR_TIME, STR_TIME)
+        print()
+
+        ans = input("Could you play this word? (Y/N)").strip().lower()
+        while ans != "y" and ans != "n":
+            ans = input("Could you play this word? (Y/N)").strip().lower()
+
+        if ans == "n":
+            typewrite_print("Alright, let's try the next best word.", CHAR_TIME, 7.)
+            avoid.append(word_from_coords(coords))
+            continue
+
+        update_board(coords)
+
+
+
+# Prints like a typewriter
+def typewrite_print(str, char_time, str_time):
+    for char in str:
+        print(char, end="", flush=True)
+        time.sleep(char_time)
+
+    time.sleep(str_time) # Pause between statements
+    print()
+        
 def solve():
     grid_print(letters)
     coords = best_move()
@@ -89,30 +134,40 @@ def collapse_down():
             letters[j][i] = ""
 
 def collapse_right(): # TODO: all the const stuff + idk if this is right
-    for i in range(6):
-        col_to_shift = set()
+    col_to_shift = []
+    for i in range(5, -1, -1):
+        print(i)
+        print(letters[5][i])
         if letters[5][i] != "":
-            col_to_shift.add(i)
+            # print("appending")
+            col_to_shift.append(i)
 
+    # print(col_to_shift)
     cur_col = 5
     for col in col_to_shift:
+        # print("shifting col " + str(col) + " to " + str(cur_col))
         for i in range(6):
             letters[i][cur_col] = letters[i][col]
 
         cur_col -= 1
 
+    # Clear all the unneeded columns on the left side
+    for i in range(6-len(col_to_shift)):
+        for j in range(6):
+            letters[j][i] = ""
+
 
 # Description: finds the best word on the board
-# Params: none
+# Params: optionally include words not to count
 # Returns: the coordinate sequence (arr[tuple(x,y)]) of the best word
-def best_move():
+def best_move(avoid = []):
     max_score = -1
     max_coords_found = []
     for i in range(len(letters)):
         for j in range(len(letters[i])):
             if letters[i][j] == "": continue
 
-            coords = max_coords([(i,j)], i, j)
+            coords = max_coords([(i,j)], i, j, avoid)
 
             if score(coords) > max_score:
                 max_coords_found = coords
@@ -124,13 +179,15 @@ def best_move():
 # Description: Given a word in progress and the most recent index, return the coordinates of the maximum word, recursively
 # Params: coords, row, col
 # Returns: Coordinate sequence of the maximum word possible given parameters
-def max_coords(coords, i, j):
+def max_coords(coords, i, j, avoid = []):
     cur_word_coords = []
 
-    if is_word(word_from_coords(coords)):
+    if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid:
         cur_word_coords = coords
 
-    if not is_prefix(word_from_coords(coords)):
+    # This means it's a valid word I believe, because it's only called if prefix or word
+    # if not is_prefix(word_from_coords(coords)) and word_from_coords(coords) not in avoid: 
+    if not is_prefix(word_from_coords(coords)): 
         return cur_word_coords
     else: # Check if the word can be extended
         for i_off in range(-1, 2):
@@ -143,16 +200,16 @@ def max_coords(coords, i, j):
 
                 if is_prefix(t_word) or is_word(t_word):
                     t_coords = coords + [(x,y)]
-                    p_coords = max_coords(t_coords, x, y)
+                    p_coords = max_coords(t_coords, x, y, avoid)
 
-                    if score(p_coords) > score(cur_word_coords):
+                    if score(p_coords) > score(cur_word_coords) and word_from_coords(p_coords) not in avoid:
                         cur_word_coords = p_coords
 
     return cur_word_coords
 
 
-def is_word(s: str) -> bool:
-    return zipf_frequency(s.lower(), 'en') > WORD_POPULARITY
+# def is_word(s: str) -> bool:
+#     return zipf_frequency(s.lower(), 'en') > WORD_POPULARITY
 
 # Params: x and y coordinate integers
 # Returns: True if both in range [0,5], false otherwise
@@ -170,7 +227,6 @@ def word_from_coords(coords):
 
     return word
 
-# TODO: this function is wrong, because it **needs** to take in coords, not words, because powerups need coords
 # Params: coordinate sequence
 # Returns: The score of the word formed by the sequence
 def score(coords):
@@ -196,6 +252,10 @@ def score(coords):
             multiplier *= 2
         elif powerups[x][y] == "tw":
             multiplier *= 3
+        elif powerups[x][y] == "dl":
+            score += scores[letters[x][y]]
+        elif powerups[x][y] == "tl":
+            score += scores[letters[x][y]] * 2
         elif powerups[x][y] == "5":
             score += 5
         elif powerups[x][y] == "10":
@@ -219,4 +279,4 @@ def grid_print(grid):
     for i in range(len(grid_copy)):
         print(grid_copy[i])
 
-solve()
+talk()
