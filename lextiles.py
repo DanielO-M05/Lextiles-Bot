@@ -54,20 +54,24 @@ powerups = [
 
 # Let's the bot have a word with you
 def talk():
-    typewrite_print("Hello, and welcome to the Lextiles Bot interface!", CHAR_TIME, STR_TIME)
-    typewrite_print("It appears that I've already been given the board state.", CHAR_TIME, STR_TIME)
-    typewrite_print("Let's go!", CHAR_TIME, STR_TIME)
+    typewrite_print("Hello, and welcome to the Lextiles Bot interface!")
+    typewrite_print("It appears that I've already been given the board state.")
+    typewrite_print("Let's go!")
     print()
 
     avoid = []
     coords = [(-1,-1)] # HACK Placeholder so as not to trigger the while loop
+    total_score = 0
 
-    while coords != []:
+    while True:
 
         grid_print(letters)
         coords = best_move(avoid=avoid)
+        if coords == []: break
+
         print(coords)
-        typewrite_print("play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".", CHAR_TIME, STR_TIME)
+        print("Score: " + str(total_score))
+        typewrite_print("Play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".")
         print()
 
         ans = input("Could you play this word? (Y/N)").strip().lower()
@@ -75,16 +79,22 @@ def talk():
             ans = input("Could you play this word? (Y/N)").strip().lower()
 
         if ans == "n":
-            typewrite_print("Alright, let's try the next best word.", CHAR_TIME, 7.)
+            typewrite_print("Alright, let's try the next best word.")
             avoid.append(word_from_coords(coords))
             continue
 
+        total_score += score(coords)
         update_board(coords)
+
+    typewrite_print("I couldn't find any words with this board.")
+    typewrite_print("Congrats! We found a solution worth " + str(total_score) + " points!")
+    typewrite_print("Ciao!")
+
 
 
 
 # Prints like a typewriter
-def typewrite_print(str, char_time, str_time):
+def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
     for char in str:
         print(char, end="", flush=True)
         time.sleep(char_time)
@@ -136,16 +146,11 @@ def collapse_down():
 def collapse_right(): # TODO: all the const stuff + idk if this is right
     col_to_shift = []
     for i in range(5, -1, -1):
-        print(i)
-        print(letters[5][i])
         if letters[5][i] != "":
-            # print("appending")
             col_to_shift.append(i)
 
-    # print(col_to_shift)
     cur_col = 5
     for col in col_to_shift:
-        # print("shifting col " + str(col) + " to " + str(cur_col))
         for i in range(6):
             letters[i][cur_col] = letters[i][col]
 
@@ -182,11 +187,10 @@ def best_move(avoid = []):
 def max_coords(coords, i, j, avoid = []):
     cur_word_coords = []
 
-    if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid:
+    if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid and len(coords) >= 3: # TODO make this a const of minLength
         cur_word_coords = coords
 
     # This means it's a valid word I believe, because it's only called if prefix or word
-    # if not is_prefix(word_from_coords(coords)) and word_from_coords(coords) not in avoid: 
     if not is_prefix(word_from_coords(coords)): 
         return cur_word_coords
     else: # Check if the word can be extended
@@ -206,10 +210,6 @@ def max_coords(coords, i, j, avoid = []):
                         cur_word_coords = p_coords
 
     return cur_word_coords
-
-
-# def is_word(s: str) -> bool:
-#     return zipf_frequency(s.lower(), 'en') > WORD_POPULARITY
 
 # Params: x and y coordinate integers
 # Returns: True if both in range [0,5], false otherwise
