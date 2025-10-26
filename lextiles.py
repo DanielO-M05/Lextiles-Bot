@@ -12,33 +12,33 @@ from wordfreq import zipf_frequency
 # TODO: variables snake case and functions camel case?
 # TODO: make trie from wordfreq and not nltk for consistency
 
-WORD_POPULARITY = 1.5
+WORD_POPULARITY = 2.5
 
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
-    "a": -1, "b": -1, "c": -1, "d": 5, "e": 2, "f": 10, "g": 5,
+    "a": 2, "b": -1, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
     "h": 10, "i": 2, "j": -1, "k": -1, "l": 3, "m": 8, "n": 2,
     "o": 2, "p": 9, "q": -1, "r": 2, "s": 4, "t": 3, "u": 2,
-    "v": -1, "w": -1, "x": -1, "y": 12, "z": -1
+    "v": 12, "w": -1, "x": -1, "y": 12, "z": -1
 }
 
 letters = [
-    ["o", "n", "i", "s", "t", "e"],
-    ["e", "r", "v", "i", "t", "d"],
-    ["h", "g", "n", "u", "h", "i"],
-    ["i", "e", "y", "t", "n", "u"],
-    ["m", "l", "t", "f", "s", "m"],
-    ["e", "o", "n", "o", "p", "f"]
+    ["p", "s", "d", "a", "e", "t"],
+    ["p", "a", "e", "i", "r", "a"],
+    ["u", "d", "l", "t", "f", "l"],
+    ["u", "d", "d", "a", "p", "e"],
+    ["l", "i", "o", "l", "g", "r"],
+    ["c", "n", "v", "a", "u", "e"]
 ] # 6 by 6 grid of strings, either "" or the letter in the cell
 
 
 powerups = [
     ["", "", "", "", "", ""],
-    ["", "", "", "", "dw", ""],
-    ["", "", "15", "", "", ""],
-    ["", "", "", "10", "", "ts"],
+    ["", "tw", "", "", "", ""],
+    ["", "", "", "ds", "", "10"],
+    ["", "", "", "", "5", ""],
     ["", "", "dl", "", "", ""],
-    ["", "", "", "", "", ""]
+    ["", "", "dl", "", "", ""]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
 # We utilize a greedy approach
@@ -48,17 +48,17 @@ powerups = [
     # This is reduced because not all paths are words, but either way it still takes too long
 
 def solve():
-    print(letters)
+    grid_print(letters)
     coords = best_move()
 
     while coords != []:
         print(coords)
-        print(word_from_coords(coords))
+        print(word_from_coords(coords) + " with a score of " + str(score(coords)))
         print()
 
         update_board(coords)
 
-        print(letters)
+        grid_print(letters)
 
         coords = best_move()
 
@@ -68,9 +68,6 @@ def update_board(coords):
         for j in range(6):
             if (i,j) in coords:
                 letters[i][j] = ""
-
-    print("before collapse")
-    print(letters)
 
     collapse_down()
     collapse_right()
@@ -92,17 +89,17 @@ def collapse_down():
             letters[j][i] = ""
 
 def collapse_right(): # TODO: all the const stuff + idk if this is right
-    for i in range(5, 0, -1): # TODO: 5 = COL - 1
-        offset = 0
-        while letters[5][i-offset] == "":
-            offset += 1
+    for i in range(6):
+        col_to_shift = set()
+        if letters[5][i] != "":
+            col_to_shift.add(i)
 
-        for i in range(6-offset):
-            for j in range(6):
-                letters[j][5-i] = letters[j][5-offset-i]
+    cur_col = 5
+    for col in col_to_shift:
+        for i in range(6):
+            letters[i][cur_col] = letters[i][col]
 
-    # Upate i in special manner?
-    
+        cur_col -= 1
 
 
 # Description: finds the best word on the board
@@ -134,7 +131,6 @@ def max_coords(coords, i, j):
         cur_word_coords = coords
 
     if not is_prefix(word_from_coords(coords)):
-        if word_from_coords(coords) == "thump": print("bruhhhh")
         return cur_word_coords
     else: # Check if the word can be extended
         for i_off in range(-1, 2):
@@ -209,8 +205,18 @@ def score(coords):
         
     return score * multiplier
 
-# coords = best_move()
-# print(coords)
-# print(word_from_coords(coords))
+# Takes 2d grid of strings and displays it nicely
+def grid_print(grid):
+    # We're padding by one space, but we could make this variable
+    grid_copy = [["" for _ in range(len(grid[i]))] for i in range(len(grid))]
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if letters[i][j] == "":
+                grid_copy[i][j] = " "
+            else:
+                grid_copy[i][j] = letters[i][j]
+
+    for i in range(len(grid_copy)):
+        print(grid_copy[i])
 
 solve()
