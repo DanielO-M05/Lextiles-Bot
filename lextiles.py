@@ -21,29 +21,29 @@ STR_TIME = .3
 
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
-    "a": 2, "b": -1, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
-    "h": 10, "i": 2, "j": -1, "k": -1, "l": 3, "m": 8, "n": 2,
+    "a": 2, "b": 6, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
+    "h": 10, "i": 2, "j": -1, "k": 14, "l": 3, "m": 8, "n": 2,
     "o": 2, "p": 9, "q": -1, "r": 2, "s": 4, "t": 3, "u": 2,
-    "v": 12, "w": -1, "x": -1, "y": 12, "z": -1
+    "v": 12, "w": 12, "x": -1, "y": 12, "z": -1
 }
 
 letters = [
-    ["p", "s", "d", "a", "e", "t"],
-    ["p", "a", "e", "i", "r", "a"],
-    ["u", "d", "l", "t", "f", "l"],
-    ["u", "d", "d", "a", "p", "e"],
-    ["l", "i", "o", "l", "g", "r"],
-    ["c", "n", "v", "a", "u", "e"]
+    ["b", "r", "a", "f", "e", "m"],
+    ["e", "o", "s", "r", "o", "o"],
+    ["m", "s", "b", "e", "h", "w"],
+    ["o", "e", "n", "i", "n", "c"],
+    ["l", "i", "n", "g", "a", "d"],
+    ["s", "k", "e", "b", "i", "e"]
 ] # 6 by 6 grid of strings, either "" or the letter in the cell
 
 
 powerups = [
     ["", "", "", "", "", ""],
-    ["", "tw", "", "", "", ""],
-    ["", "", "", "ds", "", "10"],
-    ["", "", "", "", "5", ""],
     ["", "", "", "", "", ""],
-    ["", "", "dl", "", "", ""]
+    ["", "", "5", "", "", ""],
+    ["", "", "", "tw", "", "dw"],
+    ["", "", "ts", "", "10", ""],
+    ["", "", "", "tl", "", ""]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
 # We utilize a greedy approach

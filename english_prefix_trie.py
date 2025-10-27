@@ -34,6 +34,7 @@ def load_trie():
 # Lazy-load the trie once at import time
 _trie = load_trie()
 
+# TODO Trie.has_keys_with_prefix is deprecated and will be removed in marisa_trie 0.8.0. Please use Trie.iterkeys instead.
 def is_prefix(prefix: str) -> bool:
     """Return True if any English word starts with the given prefix."""
     prefix = prefix.lower().strip()
@@ -46,10 +47,10 @@ def is_word(word: str) -> bool:
 
 if __name__ == "__main__":
     # Test examples
-    test_prefixes = ["pp", "act", "zebr"]
+    test_prefixes = ["pp", "act", "zebr", "mobile"]
     for t in test_prefixes:
         print(f"is_prefix({t!r}) -> {is_prefix(t)}")
 
-    test_words = ["pp", "ppd", "apple", "zxq"]
+    test_words = ["pp", "ppd", "apple", "zxq", "mobiles", "apples"]
     for t in test_words:
         print(f"is_word({t!r}) -> {is_word(t)}")
