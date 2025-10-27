@@ -16,6 +16,13 @@ import time
 CHAR_TIME = .03
 STR_TIME = .3
 
+# Constants for board dimensions
+NUM_ROW = 6
+NUM_COL = 6
+
+# The minimum length for a valid word
+MIN_WORD_LENGTH = 3
+
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
     "a": 2, "b": 6, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
@@ -24,6 +31,10 @@ scores = {
     "v": 12, "w": 12, "x": -1, "y": 12, "z": -1
 }
 
+# Note that throughout the run of the program, this board is mutated and restored
+# So, this does introduce global state in some limited capacity, which is maybe not great
+# If I feel like it later, I could just make this a constant and have it be passed around in functions
+# I'm keeping it like this for now, but this a consideration for later to implement a better practice
 letters = [
     ["b", "r", "a", "f", "e", "m"],
     ["e", "o", "s", "r", "o", "o"],
@@ -57,7 +68,7 @@ def talk():
     print()
 
     avoid = []
-    coords = [(-1,-1)] # HACK Placeholder so as not to trigger the while loop
+    coords = []
     total_score = 0
 
     while True:
@@ -124,38 +135,46 @@ def update_board(coords):
     collapse_down()
     collapse_right()
 
+# TODO: test
 def collapse_down():
-    for i in range(len(letters[0])):
-        new_col = []
+    # Iterate through each column
+    for i in range(NUM_COL):
+        new_col = [] # Array of letters in a column, will be shifted down
 
-        for j in range(6):
-            if letters[5-j][i] != "":
-                new_col.append(letters[5-j][i])
+        # Get all values in the column
+        for j in range(NUM_ROW):
+            if letters[NUM_ROW-j-1][i] != "":
+                new_col.append(letters[NUM_ROW-j-1][i])
 
-        # Put new col in bottom
-        for j in range(len(new_col)): # TODO change magic number 6 into ROW
-            letters[5-j][i] = new_col[j]
+        # Put new column in bottom
+        for j in range(len(new_col)):
+            letters[NUM_ROW-j-1][i] = new_col[j]
 
         # Put blanks on top:
-        for j in range(6-len(new_col)):
+        for j in range(NUM_ROW-len(new_col)):
             letters[j][i] = ""
 
-def collapse_right(): # TODO: all the const stuff + idk if this is right
-    col_to_shift = []
-    for i in range(5, -1, -1):
-        if letters[5][i] != "":
+# TODO Test
+# Prereq: We assume we have already collapsed all the columns down
+def collapse_right():
+    col_to_shift = [] # List of indices of non-empty cols 
+
+    # Populate col_to_shift
+    for i in range(NUM_COL - 1, -1, -1):
+        if letters[NUM_ROW - 1][i] != "":
             col_to_shift.append(i)
 
-    cur_col = 5
+    # Iterate through columns and put them as far right as possible
+    cur_col = NUM_COL - 1
     for col in col_to_shift:
-        for i in range(6):
+        for i in range(NUM_ROW):
             letters[i][cur_col] = letters[i][col]
 
         cur_col -= 1
 
     # Clear all the unneeded columns on the left side
-    for i in range(6-len(col_to_shift)):
-        for j in range(6):
+    for i in range(NUM_COL-len(col_to_shift)):
+        for j in range(NUM_ROW):
             letters[j][i] = ""
 
 
@@ -184,7 +203,7 @@ def best_move(avoid = []):
 def max_coords(coords, i, j, avoid = []):
     cur_word_coords = []
 
-    if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid and len(coords) >= 3: # TODO make this a const of minLength
+    if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid and len(coords) >= MIN_WORD_LENGTH:
         cur_word_coords = coords
 
     # This means it's a valid word I believe, because it's only called if prefix or word
@@ -211,7 +230,7 @@ def max_coords(coords, i, j, avoid = []):
 # Params: x and y coordinate integers
 # Returns: True if both in range [0,5], false otherwise
 def in_bounds(x, y):
-    return x >= 0 and x <= 5 and y >= 0 and y <= 5
+    return x >= 0 and x <= NUM_ROW - 1 and y >= 0 and y <= NUM_COL - 1
 
 # Params: coordinate sequence
 # Returns: a string that corresponds to the letters in the coordinate positions
@@ -275,5 +294,9 @@ def grid_print(grid):
 
     for i in range(len(grid_copy)):
         print(grid_copy[i])
+
+
+
+
 
 talk()
