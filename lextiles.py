@@ -10,10 +10,7 @@ import time
 
 # TODO: Make this whole thing a class
 # TODO: Format to docstrings
-# TODO: variables snake case and functions camel case?
-# TODO: make trie from wordfreq and not nltk for consistency
-
-WORD_POPULARITY = 2.5
+# TODO: Change dictionary to include more words (specifically plurals like "mobiles" or "apples")
 
 # .07 and 7 are pretty good times, speeding up for debugging
 CHAR_TIME = .03
@@ -52,7 +49,7 @@ powerups = [
     # It's not an easy calculation, but I want to say that brute force has many millions of possible paths
     # This is reduced because not all paths are words, but either way it still takes too long
 
-# Let's the bot have a word with you
+# Lets the bot have a word with you
 def talk():
     typewrite_print("Hello, and welcome to the Lextiles Bot interface!")
     typewrite_print("It appears that I've already been given the board state.")
