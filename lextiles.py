@@ -64,6 +64,8 @@ powerups = [
 
 # Lets the bot have a word with you
 def talk():
+    global swaps_left # HACK
+
     typewrite_print("Hello, and welcome to the Lextiles Bot interface!")
     typewrite_print("It appears that I've already been given the board state.")
     typewrite_print("Let's go!")
@@ -76,13 +78,26 @@ def talk():
     while True:
 
         grid_print(letters)
-        coords = best_move(avoid=avoid)
+        # coords = best_move(avoid=avoid)
+        swap, coords = best_move_with_swap(avoid=avoid)
         if coords == []: break
 
-        print(coords)
         print("Score: " + str(total_score))
-        typewrite_print("Play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".")
-        print()
+        print("Coords " + str(coords))
+
+        if swap:
+            swap_coord1, swap_coord2 = swap
+            print("Swap coords are " + str(swap_coord1) + " and " + str(swap_coord2))        
+            typewrite_print("Swap " + word_from_coords([swap_coord1]) + " at coordinate " + str(swap_coord1) + " with " 
+                            + word_from_coords([swap_coord2]) + " at coordinate " + str(swap_coord2))
+            
+            perform_swap(swap) # HACK Coords thing only works if you take into account the swap going on 
+            typewrite_print("Play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".")
+            perform_swap(swap)
+            print()
+        else:
+            typewrite_print("Play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".")
+            print()
 
         ans = input("Could you play this word? (Y/N)").strip().lower()
         while ans != "y" and ans != "n":
@@ -93,6 +108,9 @@ def talk():
             avoid.append(word_from_coords(coords))
             continue
 
+        if swap: swaps_left -= 1
+
+        perform_swap(swap) # TODO should this be in update_board, it should be update_board(swap, coords)
         total_score += score(coords)
         update_board(coords)
 
@@ -102,8 +120,40 @@ def talk():
 
 # Calls max coords with every swap permutation?
 # Returns tuple (swap, coords) where swap is a set of coord tuples of form set{(a,b),(c,d)} and coords is a list of coords [(a,b), (c,d), ...]
-def max_coords_with_swap():
-    pass
+def best_move_with_swap(avoid=[]):
+    global swaps_left # HACK
+    if swaps_left == 0:
+        return (frozenset(), best_move(avoid)) # HACK
+
+    swaps = make_swap_set()
+    swaps.add(frozenset()) # swap set + identity swap (no swap) HACK this is a special case needed to be handled by perform swap
+
+    max_score = 0
+    max_coords_found = []
+    swap_to_make = set()
+
+
+    for _ in range(len(swaps)):
+        print(".", end="")
+
+    print("|")
+
+    for swap in swaps:
+        print(".", end="", flush=True)
+        perform_swap(swap)
+
+        coords = best_move(avoid)
+
+        if score(coords) > max_score:
+            max_score = score(coords)
+            max_coords_found = coords
+            swap_to_make = set(swap)
+
+        perform_swap(swap) # unswap
+
+    print("|")
+    return (swap_to_make, max_coords_found)
+        
 
 
 # Prints like a typewriter
@@ -323,6 +373,10 @@ def make_swap_set():
 
 # Mutates letters[][] and swaps the two coordinates given as a parameter of set{(a,b), (c,d)}
 def perform_swap(swap):
+    # Handle identity swap
+    if not swap:
+        return 
+    
     coord1, coord2 = swap
     row1, col1 = coord1
     row2, col2 = coord2
@@ -333,5 +387,3 @@ def perform_swap(swap):
 
 
 talk()
-# print(len(make_swap_set()))
-# print(make_swap_set())
