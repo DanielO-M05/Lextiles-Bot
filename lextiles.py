@@ -154,8 +154,6 @@ def best_move_with_swap(avoid=[]):
     print("|")
     return (swap_to_make, max_coords_found)
         
-
-
 # Prints like a typewriter
 def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
     for char in str:
@@ -164,22 +162,6 @@ def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
 
     time.sleep(str_time) # Pause between statements
     print()
-
-# Currently not used     
-def solve():
-    grid_print(letters)
-    coords = best_move()
-
-    while coords != []:
-        print(coords)
-        print(word_from_coords(coords) + " with a score of " + str(score(coords)))
-        print()
-
-        update_board(coords)
-
-        grid_print(letters)
-
-        coords = best_move()
 
 def update_board(coords):
 
@@ -232,7 +214,6 @@ def collapse_right():
     for i in range(NUM_COL-len(col_to_shift)):
         for j in range(NUM_ROW):
             letters[j][i] = ""
-
 
 # Description: finds the best word on the board
 # Params: optionally include words not to count
@@ -384,6 +365,5 @@ def perform_swap(swap):
     temp = letters[row1][col1]
     letters[row1][col1] = letters[row2][col2]
     letters[row2][col2] = temp
-
 
 talk()
