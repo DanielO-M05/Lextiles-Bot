@@ -23,6 +23,8 @@ NUM_COL = 6
 # The minimum length for a valid word
 MIN_WORD_LENGTH = 3
 
+swaps_left = 3
+
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
     "a": 2, "b": 6, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
@@ -98,7 +100,10 @@ def talk():
     typewrite_print("Congrats! We found a solution worth " + str(total_score) + " points!")
     typewrite_print("Ciao!")
 
-
+# Calls max coords with every swap permutation?
+# Returns tuple (swap, coords) where swap is a set of coord tuples of form set{(a,b),(c,d)} and coords is a list of coords [(a,b), (c,d), ...]
+def max_coords_with_swap():
+    pass
 
 
 # Prints like a typewriter
@@ -109,7 +114,8 @@ def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
 
     time.sleep(str_time) # Pause between statements
     print()
-        
+
+# Currently not used     
 def solve():
     grid_print(letters)
     coords = best_move()
@@ -295,8 +301,37 @@ def grid_print(grid):
     for i in range(len(grid_copy)):
         print(grid_copy[i])
 
+# Returns a set of frozensets of tuples that correspond to possible swaps
+# So will be like: { {(a,b), (c,d)}, {(w,x), (y,z)} } meaning coords (a,b) swaps with (c,d) and (w,x) with (y,z)
+# Note sets used because order doesn't matter in a swap
+# There may be a faster way to do this, but n is small so it doesn't matter. 
+    # Also, if I rly cared about speed, I could generate this once and just use it
+def make_swap_set():
+    swaps = set()
+    for i in range(NUM_ROW):
+        for j in range(NUM_COL):
+            for i_off in range(-1, 2):
+                for j_off in range(-1, 2):
 
+                    x, y = i + i_off, j + j_off
+                    if not in_bounds(x, y) or (x,y) == (i,j) or letters[x][y] == "" : continue
 
+                    swap = frozenset([(i,j), (x,y)])
+                    swaps.add(swap) # Valid swap, add it
+
+    return swaps
+
+# Mutates letters[][] and swaps the two coordinates given as a parameter of set{(a,b), (c,d)}
+def perform_swap(swap):
+    coord1, coord2 = swap
+    row1, col1 = coord1
+    row2, col2 = coord2
+
+    temp = letters[row1][col1]
+    letters[row1][col1] = letters[row2][col2]
+    letters[row2][col2] = temp
 
 
 talk()
+# print(len(make_swap_set()))
+# print(make_swap_set())
