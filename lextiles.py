@@ -34,8 +34,10 @@ scores = {
 }
 
 # Note that throughout the run of the program, this board is mutated and restored
-# So, this does introduce global state in some limited capacity, which is maybe not great
-# If I feel like it later, I could just make this a constant and have it be passed around in functions
+# So, this does introduce global state in some limited capacity
+# If I feel like it later, I could just make this a constant and have copies be passed around in functions
+# Note that as it stands, mutable variable letters is better for runtime because it avoids having to constantly make copies
+# Functions are using letters all the time, so these deep copies may certainly add up
 # I'm keeping it like this for now, but this a consideration for later to implement a better practice
 letters = [
     ["b", "r", "a", "f", "e", "m"],
@@ -78,7 +80,6 @@ def talk():
     while True:
 
         grid_print(letters)
-        # coords = best_move(avoid=avoid)
         swap, coords = best_move_with_swap(avoid=avoid)
         if coords == []: break
 
