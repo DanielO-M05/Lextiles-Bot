@@ -28,7 +28,7 @@ swaps_left = 3
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
     "a": 2, "b": 6, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
-    "h": 10, "i": 2, "j": -1, "k": 14, "l": 3, "m": 8, "n": 2,
+    "h": 10, "i": 2, "j": 16, "k": 14, "l": 3, "m": 8, "n": 2,
     "o": 2, "p": 9, "q": -1, "r": 2, "s": 4, "t": 3, "u": 2,
     "v": 12, "w": 12, "x": -1, "y": 12, "z": -1
 }
@@ -40,22 +40,22 @@ scores = {
 # Functions are using letters all the time, so these deep copies may certainly add up
 # I'm keeping it like this for now, but this a consideration for later to implement a better practice
 letters = [
-    ["b", "r", "a", "f", "e", "m"],
-    ["e", "o", "s", "r", "o", "o"],
-    ["m", "s", "b", "e", "h", "w"],
-    ["o", "e", "n", "i", "n", "c"],
-    ["l", "i", "n", "g", "a", "d"],
-    ["s", "k", "e", "b", "i", "e"]
+    ["i", "t", "j", "f", "r", "g"],
+    ["h", "s", "u", "y", "n", "w"],
+    ["s", "e", "d", "a", "e", "o"],
+    ["i", "e", "v", "e", "d", "w"],
+    ["n", "r", "n", "e", "r", "e"],
+    ["i", "a", "v", "d", "i", "c"]
 ] # 6 by 6 grid of strings, either "" or the letter in the cell
 
 
 powerups = [
     ["", "", "", "", "", ""],
     ["", "", "", "", "", ""],
-    ["", "", "5", "", "", ""],
-    ["", "", "", "tw", "", "dw"],
-    ["", "", "ts", "", "10", ""],
-    ["", "", "", "tl", "", ""]
+    ["", "", "ts", "", "tl", ""],
+    ["", "", "", "dw", "", ""],
+    ["", "5", "", "", "", ""],
+    ["", "", "", "10", "", ""]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
 # We utilize a greedy approach
@@ -106,7 +106,9 @@ def talk():
 
         if ans == "n":
             typewrite_print("Alright, let's try the next best word.")
+            perform_swap(swap) # HACK Coords thing only works if you take into account the swap going on 
             avoid.append(word_from_coords(coords))
+            perform_swap(swap) # HACK Coords thing only works if you take into account the swap going on 
             continue
 
         if swap: swaps_left -= 1
