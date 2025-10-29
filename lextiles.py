@@ -285,6 +285,7 @@ def max_coords(coords, avoid = []):
     Returns:
         list[tuple[int, int]]: 0-indexed coordinates (row, col) of the word with the maximum score given the provided coorinates and global board state.
     """
+    # TODO this function can be optimized if the trie is updated so words arent prefixes of themselves, because then the extension check can run conditionally
     i, j = coords[-1] # The most recent coordinate
     max_word_coords = [] # The coordinates of the word found so far with the maximum score
 
@@ -470,5 +471,3 @@ def perform_swap(swap):
     letters[row2][col2] = temp
 
 talk()
-
-# class
