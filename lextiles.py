@@ -64,7 +64,6 @@ powerups = [
     # It's not an easy calculation, but I want to say that brute force has many millions of possible paths
     # This is reduced because not all paths are words, but either way it still takes too long
 
-# Lets the bot have a word with you
 def talk():
     """Runs the program! Helps you solve the puzzle.
 
