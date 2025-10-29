@@ -40,22 +40,22 @@ scores = {
 # Functions are using letters all the time, so these deep copies may certainly add up
 # I'm keeping it like this for now, but this a consideration for later to implement a better practice
 letters = [
-    ["i", "t", "j", "f", "r", "g"],
-    ["h", "s", "u", "y", "n", "w"],
-    ["s", "e", "d", "a", "e", "o"],
-    ["i", "e", "v", "e", "d", "w"],
-    ["n", "r", "n", "e", "r", "e"],
-    ["i", "a", "v", "d", "i", "c"]
+    ["e", "d", "i", "s", "e", "c"],
+    ["t", "s", "r", "n", "e", "l"],
+    ["d", "p", "e", "n", "y", "t"],
+    ["e", "a", "e", "p", "t", "u"],
+    ["i", "l", "n", "e", "p", "o"],
+    ["a", "n", "r", "t", "m", "c"]
 ] # 6 by 6 grid of strings, either "" or the letter in the cell
 
 
 powerups = [
     ["", "", "", "", "", ""],
     ["", "", "", "", "", ""],
-    ["", "", "ts", "", "tl", ""],
-    ["", "", "", "dw", "", ""],
-    ["", "5", "", "", "", ""],
-    ["", "", "", "10", "", ""]
+    ["", "", "5", "", "", ""],
+    ["", "", "", "dw", "", "ts"],
+    ["", "", "15", "", "10", ""],
+    ["", "", "", "tw", "", ""]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
 # We utilize a greedy approach
@@ -248,6 +248,7 @@ def max_coords(coords, i, j, avoid = []):
 
     # This means it's a valid word I believe, because it's only called if prefix or word
     if not is_prefix(word_from_coords(coords)): 
+        print("hi") # THIS NEVER RUNS??
         return cur_word_coords
     else: # Check if the word can be extended
         for i_off in range(-1, 2):
@@ -264,7 +265,6 @@ def max_coords(coords, i, j, avoid = []):
 
                     if score(p_coords) > score(cur_word_coords) and word_from_coords(p_coords) not in avoid:
                         cur_word_coords = p_coords
-
     return cur_word_coords
 
 # Params: x and y coordinate integers

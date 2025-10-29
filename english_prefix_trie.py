@@ -47,10 +47,10 @@ def is_word(word: str) -> bool:
 
 if __name__ == "__main__":
     # Test examples
-    test_prefixes = ["pp", "act", "zebr", "mobile"]
+    test_prefixes = ["pp", "act", "zebr", "mobile", "acetylsalicylic", "apple"]
     for t in test_prefixes:
         print(f"is_prefix({t!r}) -> {is_prefix(t)}")
 
-    test_words = ["pp", "ppd", "apple", "zxq", "mobiles", "apples"]
+    test_words = ["pp", "ppd", "apple", "zxq", "mobiles", "apples", "acetylsalicylic", "elapsed"]
     for t in test_words:
         print(f"is_word({t!r}) -> {is_word(t)}")
