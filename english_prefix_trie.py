@@ -2,7 +2,7 @@
 english_prefix_trie.py
 ----------------------
 Builds or loads a MARISA trie of English words (from wordfreq)
-and provides a fast prefix- and word-checking function.
+and provides a fast prefix and word-checking function.
 """
 
 import os

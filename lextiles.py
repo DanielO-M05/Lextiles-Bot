@@ -10,7 +10,7 @@ import time
 
 # TODO: Format to docstrings
 # TODO: Change dictionary to include more words (specifically plurals like "mobiles" or "apples")
-# BUG: in notes app, but swap set needs to be revised a little to avoid unnecessary swapping
+# TODO: Wait coordinates should definitely be an object... what the hell is frozenset{tuple[int, int], tuple[int, int]}
 
 # .07 and 7 are pretty good times, speeding up for debugging
 CHAR_TIME = .03
@@ -66,6 +66,14 @@ powerups = [
 
 # Lets the bot have a word with you
 def talk():
+    """Runs the program! Helps you solve the puzzle.
+
+    Args:
+        None: uses global state
+
+    Returns:
+        None: prints to terminal
+    """
     global swaps_left # HACK
 
     typewrite_print("Hello, and welcome to the Lextiles Bot interface!")
@@ -81,7 +89,7 @@ def talk():
 
         grid_print(letters)
         swap, coords = best_move_with_swap(avoid=avoid)
-        if coords == []: break
+        if coords == []: break # No more words left
 
         print("Score: " + str(total_score))
         print("Coords " + str(coords))
@@ -92,13 +100,8 @@ def talk():
             typewrite_print("Swap " + word_from_coords([swap_coord1]) + " at coordinate " + str(swap_coord1) + " with " 
                             + word_from_coords([swap_coord2]) + " at coordinate " + str(swap_coord2))
             
-            perform_swap(swap) # HACK Coords thing only works if you take into account the swap going on 
-            typewrite_print("Play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".")
-            perform_swap(swap)
-            print()
-        else:
-            typewrite_print("Play " + word_from_coords(coords) + " for a score of " + str(score(coords)) + ".")
-            print()
+        typewrite_print("Play " + word_from_coords(coords, swap=swap) + " for a score of " + str(score(coords, swap=swap)) + ".")
+        print()
 
         ans = input("Could you play this word? (Y/N)").strip().lower()
         while ans != "y" and ans != "n":
@@ -106,30 +109,32 @@ def talk():
 
         if ans == "n":
             typewrite_print("Alright, let's try the next best word.")
-            perform_swap(swap) # HACK Coords thing only works if you take into account the swap going on 
-            avoid.append(word_from_coords(coords))
-            perform_swap(swap) # HACK Coords thing only works if you take into account the swap going on 
+            avoid.append(word_from_coords(coords, swap=swap))
             continue
 
         if swap: swaps_left -= 1
 
-        perform_swap(swap) # TODO should this be in update_board, it should be update_board(swap, coords)
-        total_score += score(coords)
-        update_board(coords)
+        total_score += score(coords, swap=swap)
+        update_board(coords, swap=swap)
 
     typewrite_print("I couldn't find any words with this board.")
     typewrite_print("Congrats! We found a solution worth " + str(total_score) + " points!")
     typewrite_print("Ciao!")
 
-# Calls max coords with every swap permutation?
-# Returns tuple (swap, coords) where swap is a set of coord tuples of form set{(a,b),(c,d)} and coords is a list of coords [(a,b), (c,d), ...]
 def best_move_with_swap(avoid=[]):
+    """Returns the coordinates of the word with the maximum score on the board given a set of swaps, except for any words specified.
+
+    Args:
+        avoid, optional (list[str]): Strings that should not count as valid words.
+
+    Returns:
+        tuple[frozenset{tuple[int, int], tuple[int, int]}, list[tuple[int, int]]]: 0-indexed coordinates (row, col) of the word with the maximum score given the board state.
+    """
     global swaps_left # HACK
     if swaps_left == 0:
         return (frozenset(), best_move(avoid)) # HACK
 
     swaps = make_swap_set()
-    swaps.add(frozenset()) # swap set + identity swap (no swap) HACK this is a special case needed to be handled by perform swap
 
     max_score = 0
     max_coords_found = []
@@ -157,8 +162,17 @@ def best_move_with_swap(avoid=[]):
     print("|")
     return (swap_to_make, max_coords_found)
         
-# Prints like a typewriter
 def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
+    """Prints to the screen with delay between characters
+
+    Args:
+        str (str): The string to be printed
+        char_time, optional (float): The delay between characters
+        str_time, optional (float): The delay after printing
+
+    Returns:
+        None: Prints to the terminal
+    """
     for char in str:
         print(char, end="", flush=True)
         time.sleep(char_time)
@@ -166,8 +180,16 @@ def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
     time.sleep(str_time) # Pause between statements
     print()
 
-def update_board(coords):
+def update_board(coords, swap=frozenset()):
+    """Mutates the global board state to reflect a word being played, with an optional swap before it. 
 
+    Args:
+        coords (list[tuple[int, int]]): 0-indexed coordinates (row, col) of the word being played.
+
+    Returns:
+        None: mutates global board state
+    """
+    perform_swap(swap)
     for i in range(6):
         for j in range(6):
             if (i,j) in coords:
@@ -176,8 +198,15 @@ def update_board(coords):
     collapse_down()
     collapse_right()
 
-# TODO: test
 def collapse_down():
+    """Mutates the global board to move letters down
+
+    Args:
+        None: mutates global board state
+
+    Returns:
+        None: mutates global board state
+    """
     # Iterate through each column
     for i in range(NUM_COL):
         new_col = [] # Array of letters in a column, will be shifted down
@@ -195,9 +224,15 @@ def collapse_down():
         for j in range(NUM_ROW-len(new_col)):
             letters[j][i] = ""
 
-# TODO Test
-# Prereq: We assume we have already collapsed all the columns down
 def collapse_right():
+    """Mutates the global board to move columns to the right where there are gaps
+
+    Args:
+        None: mutates global board state, assumed to have already been collapsed down.
+
+    Returns:
+        None: mutates global board state
+    """
     col_to_shift = [] # List of indices of non-empty cols 
 
     # Populate col_to_shift
@@ -218,10 +253,15 @@ def collapse_right():
         for j in range(NUM_ROW):
             letters[j][i] = ""
 
-# Description: finds the best word on the board
-# Params: optionally include words not to count
-# Returns: the coordinate sequence (arr[tuple(x,y)]) of the best word
 def best_move(avoid = []):
+    """Returns the coordinates of the word with the maximum score on the board, except for any words specified.
+
+    Args:
+        avoid, optional (list[str]): Strings that should not count as valid words.
+
+    Returns:
+        list[tuple[int, int]]: 0-indexed coordinates (row, col) of the word with the maximum score given the board state.
+    """
     max_score = -1
     max_coords_found = []
     for i in range(len(letters)):
@@ -235,22 +275,22 @@ def best_move(avoid = []):
                 max_score = score(coords)
 
     return max_coords_found
-      
+   
 def max_coords(coords, avoid = []):
-    """Returns the coordinates of the word with the maximum score on the board, except for any words specified.
+    """Returns the coordinates of the word with the maximum starting with the coordinates provided, except for any words specified.
 
     Args:
         coords (list[tuple[int, int]]): 0-indexed coordinates (row, col) of the word so far.
         avoid (list[str]): Strings that should not count as valid words.
 
     Returns:
-        list[tuple[int, int]]: 0-indexed coordinates (row, col) of the word with the maximum score given the board state.
+        list[tuple[int, int]]: 0-indexed coordinates (row, col) of the word with the maximum score given the provided coorinates and global board state.
     """
-    i, j = coords[-1]
-    cur_word_coords = []
+    i, j = coords[-1] # The most recent coordinate
+    max_word_coords = [] # The coordinates of the word found so far with the maximum score
 
     if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid and len(coords) >= MIN_WORD_LENGTH:
-        cur_word_coords = coords
+        max_word_coords = coords
 
     # See if word can be extended
     for i_off in range(-1, 2):
@@ -259,37 +299,68 @@ def max_coords(coords, avoid = []):
 
             # Make sure path is valid
             if not in_bounds(x, y) or (x,y) in coords or letters[x][y] == "" : continue
-            t_word = word_from_coords(coords) + letters[x][y]
+            t_word = word_from_coords(coords) + letters[x][y] # t is for temp, the set of letters we are temporarily considering
 
-            if is_prefix(t_word) or is_word(t_word):
+            
+            if is_prefix(t_word) or is_word(t_word): # If this temporary word is a prefix or word, make the recursive call
                 t_coords = coords + [(x,y)]
                 p_coords = max_coords(t_coords, avoid)
 
-                if score(p_coords) > score(cur_word_coords) and word_from_coords(p_coords) not in avoid:
-                    cur_word_coords = p_coords
+                if score(p_coords) > score(max_word_coords) and word_from_coords(p_coords) not in avoid:
+                    max_word_coords = p_coords
 
-    return cur_word_coords
+    return max_word_coords
 
-# Params: x and y coordinate integers
-# Returns: True if both in range [0,5], false otherwise
 def in_bounds(x, y):
+    """Returns if the integers are in the bounds of the board.
+
+    Args:
+        x (int): the 0-indexed row.
+        y (int): the 0-indexed col.
+
+    Returns:
+        bool: True if in bounds, false otherwise 
+    """
     return x >= 0 and x <= NUM_ROW - 1 and y >= 0 and y <= NUM_COL - 1
 
-# Params: coordinate sequence
-# Returns: a string that corresponds to the letters in the coordinate positions
-def word_from_coords(coords):
+def word_from_coords(coords, swap=frozenset()):
+    """Returns the word represented by a set of coordinates on the board, optionally first performing a swap.
+
+    Args:
+        coords (list[tuple[int, int]]): 0-indexed coordinates (row, col) of the word on the board.
+        swap (frozenset{tuple[int,int], tuple[int,int]}): 0-indexed coordinates (row, col) of the coordinates to be swapped before calculation.
+
+    Returns:
+        str: The word represented by the swap and set of coordinates on the board.
+
+    Notes: When swap=frozenset(), this indicates the identity swap, a swap that does not change the board state (i.e. no swap).
+    """
+    perform_swap(swap)
     word = ""
 
     for i in range(len(coords)):
         x, y = coords[i]
         word = word + letters[x][y]
 
+    perform_swap(swap) # Return board state to normal
     return word
 
-# Params: coordinate sequence
-# Returns: The score of the word formed by the sequence
-def score(coords):
+def score(coords, swap=frozenset()):
+    """Returns the score of a word represented by a set of coordinates on the board, optionally first performing a swap.
+
+    Args:
+        coords (list[tuple[int, int]]): 0-indexed coordinates (row, col) of the word on the board.
+        swap (frozenset{tuple[int,int], tuple[int,int]}): 0-indexed coordinates (row, col) of the coordinates to be swapped before calculation.
+
+    Returns:
+        int: The score of the word
+
+    Raises:
+        RuntimeError: If one of the coordinates does not have a letter. 
+    """
     if coords == []: return 0
+
+    perform_swap(swap)
 
     score = 0
     multiplier = 1
@@ -297,8 +368,8 @@ def score(coords):
     for i in range(len(coords)):
         x, y = coords[i]
 
-        # HACK
-        if letters[x][y] == "": return 0
+        if letters[x][y] == "": 
+            raise RuntimeError("It's so over. One of the coordinates is empty.")
 
         score += scores[letters[x][y]]
 
@@ -321,29 +392,45 @@ def score(coords):
             score += 10
         elif powerups[x][y] == "15":
             score += 15
+
+    perform_swap(swap) # unswap
         
     return score * multiplier
 
-# Takes 2d grid of strings and displays it nicely
-def grid_print(grid):
-    # We're padding by one space, but we could make this variable
+def grid_print(grid, padding=" "):
+    """Prints a grid with some padding to make it look nice.
+
+    Args:
+        grid (list[list[strings]]): The grid to be printed.
+        padding, optional (str): The string to pad the grid with.
+
+    Returns:
+        None: This function prints to the terminal.
+    """
     grid_copy = [["" for _ in range(len(grid[i]))] for i in range(len(grid))]
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             if letters[i][j] == "":
-                grid_copy[i][j] = " "
+                grid_copy[i][j] = padding
             else:
                 grid_copy[i][j] = letters[i][j]
 
     for i in range(len(grid_copy)):
         print(grid_copy[i])
 
-# Returns a set of frozensets of tuples that correspond to possible swaps
-# So will be like: { {(a,b), (c,d)}, {(w,x), (y,z)} } meaning coords (a,b) swaps with (c,d) and (w,x) with (y,z)
-# Note sets used because order doesn't matter in a swap
-# There may be a faster way to do this, but n is small so it doesn't matter. 
-    # Also, if I rly cared about speed, I could generate this once and just use it
 def make_swap_set():
+    """Returns a list of frozensets of tuples that represent the coordinates of all unique possible swaps given the global board state.
+
+    Args:
+        None: The board is global.
+
+    Returns:
+        list[frozenset{tuple[int, int], tuple[int, int]}]: The list of frozensets of tuples of length 2 that represent the 0-indexed coordinates 
+                                                            of all unique possible swaps given the global board state.
+
+    Notes: When swap=frozenset(), this indicates the identity swap, a swap that does not change the board state (i.e. no swap). 
+            The first swap in the returned list is always the identity swap.
+    """
     swaps = set()
     for i in range(NUM_ROW):
         for j in range(NUM_COL):
@@ -351,15 +438,26 @@ def make_swap_set():
                 for j_off in range(-1, 2):
 
                     x, y = i + i_off, j + j_off
-                    if not in_bounds(x, y) or (x,y) == (i,j) or letters[x][y] == "" or letters[i][j] == "": continue
+                    if not in_bounds(x, y) or (x,y) == (i,j) or letters[x][y] == "" or letters[i][j] == "" or letters[x][y] == letters[i][j]: continue
 
                     swap = frozenset([(i,j), (x,y)])
                     swaps.add(swap) # Valid swap, add it
 
+    swaps = list(swaps)
+    swaps.insert(0, frozenset()) # NOTE We are putting the identity set first so that in case of a tie, the case with no swap is put in first
     return swaps
 
-# Mutates letters[][] and swaps the two coordinates given as a parameter of set{(a,b), (c,d)}
 def perform_swap(swap):
+    """Mutate the board to represent the result of a swap.
+
+    Args:
+        swap (frozenset{tuple[int,int], tuple[int,int]}): 0-indexed coordinates (row, col) of the coordinates to be swapped.
+
+    Returns:
+        None: This function mutates the global variable letters
+
+    Notes: When swap=frozenset(), this indicates the identity swap, a swap that does not change the board state (i.e. no swap).
+    """
     # Handle identity swap
     if not swap:
         return 
