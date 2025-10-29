@@ -301,8 +301,7 @@ def max_coords(coords, avoid = []):
             if not in_bounds(x, y) or (x,y) in coords or letters[x][y] == "" : continue
             t_word = word_from_coords(coords) + letters[x][y] # t is for temp, the set of letters we are temporarily considering
 
-            
-            if is_prefix(t_word) or is_word(t_word): # If this temporary word is a prefix or word, make the recursive call
+            if is_prefix(t_word): # If this temporary word is a prefix or word, make the recursive call
                 t_coords = coords + [(x,y)]
                 p_coords = max_coords(t_coords, avoid)
 
