@@ -470,3 +470,5 @@ def perform_swap(swap):
     letters[row2][col2] = temp
 
 talk()
+
+# class
