@@ -8,9 +8,9 @@ from english_prefix_trie import is_prefix, is_word
 from wordfreq import zipf_frequency
 import time
 
-# TODO: Make this whole thing a class
 # TODO: Format to docstrings
 # TODO: Change dictionary to include more words (specifically plurals like "mobiles" or "apples")
+# BUG: in notes app, but swap set needs to be revised a little to avoid unnecessary swapping
 
 # .07 and 7 are pretty good times, speeding up for debugging
 CHAR_TIME = .03
@@ -228,7 +228,7 @@ def best_move(avoid = []):
         for j in range(len(letters[i])):
             if letters[i][j] == "": continue
 
-            coords = max_coords([(i,j)], i, j, avoid)
+            coords = max_coords([(i,j)], avoid)
 
             if score(coords) > max_score:
                 max_coords_found = coords
@@ -236,35 +236,41 @@ def best_move(avoid = []):
 
     return max_coords_found
       
-# Note: should prob rename this to max_coords
 # Description: Given a word in progress and the most recent index, return the coordinates of the maximum word, recursively
 # Params: coords, row, col
 # Returns: Coordinate sequence of the maximum word possible given parameters
-def max_coords(coords, i, j, avoid = []):
+def max_coords(coords, avoid = []):
+    """Returns the coordinates of the word with the maximum score on the board, except for any words specified.
+
+    Args:
+        coords (list[tuple[int, int]]): 0-indexed coordinates (row, col) of the word so far.
+        avoid (list[str]): Strings that should not count as valid words.
+
+    Returns:
+        list[tuple[int, int]]: 0-indexed coordinates (row, col) of the word with the maximum score given the board state.
+    """
+    i, j = coords[-1]
     cur_word_coords = []
 
     if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid and len(coords) >= MIN_WORD_LENGTH:
         cur_word_coords = coords
 
-    # This means it's a valid word I believe, because it's only called if prefix or word
-    if not is_prefix(word_from_coords(coords)): 
-        print("hi") # THIS NEVER RUNS??
-        return cur_word_coords
-    else: # Check if the word can be extended
-        for i_off in range(-1, 2):
-            for j_off in range(-1, 2):
-                x, y = i + i_off, j + j_off
+    # See if word can be extended
+    for i_off in range(-1, 2):
+        for j_off in range(-1, 2):
+            x, y = i + i_off, j + j_off
 
-                # Make sure path is valid
-                if not in_bounds(x, y) or (x,y) in coords or letters[x][y] == "" : continue
-                t_word = word_from_coords(coords) + letters[x][y]
+            # Make sure path is valid
+            if not in_bounds(x, y) or (x,y) in coords or letters[x][y] == "" : continue
+            t_word = word_from_coords(coords) + letters[x][y]
 
-                if is_prefix(t_word) or is_word(t_word):
-                    t_coords = coords + [(x,y)]
-                    p_coords = max_coords(t_coords, x, y, avoid)
+            if is_prefix(t_word) or is_word(t_word):
+                t_coords = coords + [(x,y)]
+                p_coords = max_coords(t_coords, avoid)
 
-                    if score(p_coords) > score(cur_word_coords) and word_from_coords(p_coords) not in avoid:
-                        cur_word_coords = p_coords
+                if score(p_coords) > score(cur_word_coords) and word_from_coords(p_coords) not in avoid:
+                    cur_word_coords = p_coords
+
     return cur_word_coords
 
 # Params: x and y coordinate integers
@@ -348,7 +354,7 @@ def make_swap_set():
                 for j_off in range(-1, 2):
 
                     x, y = i + i_off, j + j_off
-                    if not in_bounds(x, y) or (x,y) == (i,j) or letters[x][y] == "" : continue
+                    if not in_bounds(x, y) or (x,y) == (i,j) or letters[x][y] == "" or letters[i][j] == "": continue
 
                     swap = frozenset([(i,j), (x,y)])
                     swaps.add(swap) # Valid swap, add it
