@@ -236,9 +236,6 @@ def best_move(avoid = []):
 
     return max_coords_found
       
-# Description: Given a word in progress and the most recent index, return the coordinates of the maximum word, recursively
-# Params: coords, row, col
-# Returns: Coordinate sequence of the maximum word possible given parameters
 def max_coords(coords, avoid = []):
     """Returns the coordinates of the word with the maximum score on the board, except for any words specified.
 
