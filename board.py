@@ -145,7 +145,7 @@ class Board:
         for r in range(self.num_rows):
             for c in range(self.num_cols):
                 coord = Coordinate(r, c)
-                if self.letters[r][c] == "":
+                if self[coord] == "":
                     continue
 
                 for dr in (-1, 0, 1):
@@ -156,9 +156,9 @@ class Board:
                         new = Coordinate(nr, nc)
                         if not new.in_bounds(self.num_rows, self.num_cols):
                             continue
-                        if self.letters[nr][nc] == "":
+                        if self[new] == "" or self[coord] == "":
                             continue
-                        if self.letters[nr][nc] == self.letters[r][c]:
+                        if self[new] == self[coord]:
                             continue
 
                         swaps.add(Swap(coord, new))
@@ -194,7 +194,6 @@ class Board:
             # Put blanks on top
             for j in range(self.num_rows - len(new_col)):
                 self.letters[j][i] = ""
-
 
     def _collapse_right(self):
         """Column collapse to the right."""
