@@ -39,6 +39,7 @@ class Game:
             return Swap.identity(), self.board.best_move(avoid)
 
         swaps = self.board.possible_swaps()
+        print(len(swaps))
         max_score = -1
         best_coords = []
         best_swap = Swap.identity()
@@ -63,8 +64,8 @@ class Game:
     # ----------- Main Loop -----------
 
     def run(self):
-        # self.typewrite_print("Hello, and welcome to the Lextiles Bot interface!")
-        # self.typewrite_print("It appears that I've already been given the board state.")
+        self.typewrite_print("Hello, and welcome to the Lextiles Bot interface!")
+        self.typewrite_print("It appears that I've already been given the board state.")
         self.typewrite_print("Let's go!\n")
 
         avoid = []

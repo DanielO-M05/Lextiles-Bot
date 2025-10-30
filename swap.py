@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from coordinate import Coordinate
 from typing import Optional
 
+# TODO make swaps ordered and hashable so that duplicates are removed
 @dataclass(frozen=True)
 class Swap:
     """Swap between two coordinates. Identity swap is falsy."""

@@ -140,6 +140,7 @@ class Board:
             self.swap(swap.coord1, swap.coord2)
 
     def possible_swaps(self) -> list[Swap]:
+        # TODO fix, this generates too many swaps, duplicates are not removed because swap innacuracy
         swaps = set()
 
         for r in range(self.num_rows):
@@ -156,7 +157,7 @@ class Board:
                         new = Coordinate(nr, nc)
                         if not new.in_bounds(self.num_rows, self.num_cols):
                             continue
-                        if self[new] == "" or self[coord] == "":
+                        if self[new] == "":
                             continue
                         if self[new] == self[coord]:
                             continue
