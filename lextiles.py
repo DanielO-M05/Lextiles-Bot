@@ -24,6 +24,7 @@ NUM_COL = 6
 MIN_WORD_LENGTH = 3
 
 swaps_left = 3
+count = 0
 
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
@@ -112,6 +113,8 @@ def talk():
             continue
 
         if swap: swaps_left -= 1
+
+        print(count)
 
         total_score += score(coords, swap=swap)
         update_board(coords, swap=swap)
@@ -290,6 +293,8 @@ def max_coords(coords, avoid = []):
     max_word_coords = [] # The coordinates of the word found so far with the maximum score
 
     if is_word(word_from_coords(coords)) and word_from_coords(coords) not in avoid and len(coords) >= MIN_WORD_LENGTH:
+        global count 
+        count += 1
         max_word_coords = coords
 
     # See if word can be extended
