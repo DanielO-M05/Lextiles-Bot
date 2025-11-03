@@ -26,3 +26,7 @@ class Coordinate:
 
     def __repr__(self):
         return f"Coordinate({self.row}, {self.col})"
+    
+    def __eq__(self, other):
+        return isinstance(other, Coordinate) and self.row == other.row and self.col == other.col
+
