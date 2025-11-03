@@ -234,14 +234,16 @@ class Board:
                         coord1 = Coordinate(i, j)
                         coord2 = coord1 + (i_off, j_off)
 
-                        if not coord2.in_bounds(self.NUM_ROWS, self.NUM_COLS) or coord1 == coord2 or self.letter_at(coord1) == "" or self.letter_at(coord2) == "" or self.letter_at(coord1) == self.letter_at(coord2): continue
+                        if not coord2.in_bounds(self.NUM_ROWS, self.NUM_COLS) or coord1 == coord2 or self.letter_at(coord1) == "" or self.letter_at(coord2) == "": continue
+
+                        if self.letter_at(coord1) == self.letter_at(coord2): # Swapping a letter with itself will do nothing
+                            continue
 
                         swap = Swap((coord1, coord2))
                         swaps.add(swap) # Valid swap, add it
 
         swaps = list(swaps)
         swaps.insert(0, Swap()) # NOTE We are putting the identity set first so that in case of a tie, the case with no swap is put in first
-        print(swaps)
         return swaps
     
 
