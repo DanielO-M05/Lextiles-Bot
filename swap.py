@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 
 @dataclass(frozen=True)
 class Swap:
-    coords: Optional[Tuple[Coordinate, Coordinate]]
+    coords: Optional[Tuple[Coordinate, Coordinate]] = None
 
     def __bool__(self):
         return self.coords is not None
@@ -13,6 +13,18 @@ class Swap:
         if self.coords is None:
             return iter((None, None))
         return iter(self.coords)
+    
+    def __eq__(self, other):
+        if not isinstance(other, Swap):
+            return False
+        if self.coords is None or other.coords is None:
+            return self.coords is other.coords  # identity comparison for None
+        return frozenset(self.coords) == frozenset(other.coords) # Order doesn't matter
+
+    def __hash__(self):
+        if self.coords is None:
+            return hash(None)
+        return hash(frozenset(self.coords)) # Order doesn't matter
     
     def __str__(self):
         if not self:
