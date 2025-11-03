@@ -8,22 +8,13 @@ import time
 
 from board import Board
 
-# TODO: Format to docstrings
-# TODO: Change dictionary to include more words (specifically plurals like "mobiles" or "apples")
-# TODO: Wait coordinates should definitely be an object... what the hell is frozenset{tuple[int, int], tuple[int, int]}
-
 # .07 and 7 are pretty good times, speeding up for debugging
 CHAR_TIME = .03
 STR_TIME = .3
 
-# Constants for board dimensions
-NUM_ROW = 6
-NUM_COL = 6
-
 # The minimum length for a valid word
 MIN_WORD_LENGTH = 3
 
-swaps_left = 3
 count = 0
 
 # TODO: these scores are not fully updated, I don't know all of their values
@@ -34,29 +25,22 @@ scores = {
     "v": 12, "w": 12, "x": -1, "y": 12, "z": -1
 }
 
-# Note that throughout the run of the program, this board is mutated and restored
-# So, this does introduce global state in some limited capacity
-# If I feel like it later, I could just make this a constant and have copies be passed around in functions
-# Note that as it stands, mutable variable letters is better for runtime because it avoids having to constantly make copies
-# Functions are using letters all the time, so these deep copies may certainly add up
-# I'm keeping it like this for now, but this a consideration for later to implement a better practice
 letters = [
-    ["e", "d", "i", "s", "e", "c"],
-    ["t", "s", "r", "n", "e", "l"],
-    ["d", "p", "e", "n", "y", "t"],
-    ["e", "a", "e", "p", "t", "u"],
-    ["i", "l", "n", "e", "p", "o"],
-    ["a", "n", "r", "t", "m", "c"]
+    ["d", "e", "s", "s", "e", "k"],
+    ["s", "o", "d", "e", "r", "e"],
+    ["p", "r", "n", "l", "p", "n"],
+    ["v", "e", "g", "i", "e", "d"],
+    ["e", "i", "o", "a", "o", "k"],
+    ["r", "m", "b", "r", "e", "n"]
 ] # 6 by 6 grid of strings, either "" or the letter in the cell
-
 
 powerups = [
     ["", "", "", "", "", ""],
-    ["", "", "", "", "", ""],
-    ["", "", "5", "", "", ""],
-    ["", "", "", "dw", "", "ts"],
-    ["", "", "15", "", "10", ""],
-    ["", "", "", "tw", "", ""]
+    ["", "tw", "", "", "", ""],
+    ["", "", "", "", "", "ds"],
+    ["", "", "10", "", "", ""],
+    ["", "", "", "ts", "", ""],
+    ["", "", "dl", "", "", "tl"]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
 # We utilize a greedy approach
@@ -129,6 +113,6 @@ def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
     time.sleep(str_time) # Pause between statements
     print()
 
-board = Board(letters, powerups, scores, swaps_left, MIN_WORD_LENGTH)
+board = Board(letters, powerups, scores, 3, MIN_WORD_LENGTH)
 
 talk(board)
