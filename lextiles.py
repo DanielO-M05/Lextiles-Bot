@@ -4,8 +4,6 @@ Author: Daniel Otto-Manzano
 '''
 
 from english_prefix_trie import is_prefix, is_word
-
-from wordfreq import zipf_frequency
 import time
 
 # TODO: Format to docstrings
@@ -122,48 +120,7 @@ def talk():
     typewrite_print("I couldn't find any words with this board.")
     typewrite_print("Congrats! We found a solution worth " + str(total_score) + " points!")
     typewrite_print("Ciao!")
-
-def best_move_with_swap(avoid=[]):
-    """Returns the coordinates of the word with the maximum score on the board given a set of swaps, except for any words specified.
-
-    Args:
-        avoid, optional (list[str]): Strings that should not count as valid words.
-
-    Returns:
-        tuple[frozenset{tuple[int, int], tuple[int, int]}, list[tuple[int, int]]]: 0-indexed coordinates (row, col) of the word with the maximum score given the board state.
-    """
-    global swaps_left # HACK
-    if swaps_left == 0:
-        return (frozenset(), best_move(avoid)) # HACK
-
-    swaps = make_swap_set()
-
-    max_score = 0
-    max_coords_found = []
-    swap_to_make = set()
-
-
-    for _ in range(len(swaps)):
-        print(".", end="")
-
-    print("|")
-
-    for swap in swaps:
-        print(".", end="", flush=True)
-        perform_swap(swap)
-
-        coords = best_move(avoid)
-
-        if score(coords) > max_score:
-            max_score = score(coords)
-            max_coords_found = coords
-            swap_to_make = set(swap)
-
-        perform_swap(swap) # unswap
-
-    print("|")
-    return (swap_to_make, max_coords_found)
-        
+      
 def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
     """Prints to the screen with delay between characters
 
@@ -255,28 +212,7 @@ def collapse_right():
         for j in range(NUM_ROW):
             letters[j][i] = ""
 
-def best_move(avoid = []):
-    """Returns the coordinates of the word with the maximum score on the board, except for any words specified.
 
-    Args:
-        avoid, optional (list[str]): Strings that should not count as valid words.
-
-    Returns:
-        list[tuple[int, int]]: 0-indexed coordinates (row, col) of the word with the maximum score given the board state.
-    """
-    max_score = -1
-    max_coords_found = []
-    for i in range(len(letters)):
-        for j in range(len(letters[i])):
-            if letters[i][j] == "": continue
-
-            coords = max_coords([(i,j)], avoid)
-
-            if score(coords) > max_score:
-                max_coords_found = coords
-                max_score = score(coords)
-
-    return max_coords_found
    
 def max_coords(coords, avoid = []):
     """Returns the coordinates of the word with the maximum starting with the coordinates provided, except for any words specified.
