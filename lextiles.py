@@ -15,8 +15,6 @@ STR_TIME = .3
 # The minimum length for a valid word
 MIN_WORD_LENGTH = 3
 
-count = 0
-
 # TODO: these scores are not fully updated, I don't know all of their values
 scores = {
     "a": 2, "b": 6, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
