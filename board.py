@@ -341,7 +341,3 @@ class Board:
         for i in range(self.NUM_COLS-len(col_to_shift)):
             for j in range(self.NUM_ROWS):
                 self.letters[j][i] = ""
-
-
-
-
