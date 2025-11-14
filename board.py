@@ -85,8 +85,7 @@ class Board:
                     max_score = self.score(coords)
 
         return max_coords_found
-    
-       
+        
     def max_coords(self, coords):
         """Returns the coordinates of the word with the maximum starting with the coordinates provided, except for any words specified.
 
@@ -121,7 +120,6 @@ class Board:
 
         return max_word_coords
     
-
     def word_from_coords(self, coords, swap=Swap()):
         """Returns the word represented by a set of coordinates on the board, optionally first performing a swap.
 
@@ -141,7 +139,6 @@ class Board:
 
         self.perform_swap(swap) # Return board state to normal
         return word
-    
     
     def score(self, coords, swap=Swap()):
         """Returns the score of a word represented by a set of coordinates on the board, optionally first performing a swap.
@@ -215,7 +212,6 @@ class Board:
         self.letters[row1][col1] = self.letters[row2][col2]
         self.letters[row2][col2] = temp
 
-
     def make_swap_set(self):
         """Returns a list of swap that are the coordinates of all unique possible swaps given the board state.
 
@@ -246,7 +242,6 @@ class Board:
         swaps.insert(0, Swap()) # NOTE We are putting the identity set first so that in case of a tie, the case with no swap is put in first
         return swaps
     
-
     def grid_print(self, grid, padding=" "):
         """Prints a grid with some padding to make it look nice.
 
