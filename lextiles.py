@@ -24,21 +24,21 @@ scores = {
 }
 
 letters = [
-    ["e", "t", "g", "o", "m", "o"],
-    ["f", "i", "s", "e", "g", "n"],
-    ["a", "c", "e", "m", "m", "i"],
-    ["e", "n", "d", "u", "a", "n"],
-    ["a", "f", "o", "d", "l", "a"],
-    ["i", "l", "c", "l", "d", "e"]
+    ["n", "i", "s", "o", "i", "g"],
+    ["h", "i", "r", "v", "n", "c"],
+    ["g", "u", "n", "s", "e", "e"],
+    ["o", "h", "m", "n", "t", "e"],
+    ["l", "m", "s", "u", "c", "r"],
+    ["d", "a", "p", "o", "l", "e"]
 ] # 6 by 6 grid of strings, either "" or the letter in the cell
 
 powerups = [
     ["", "", "", "", "", ""],
-    ["", "10", "", "", "", ""],
-    ["", "", "", "tl", "", "ds"],
-    ["", "", "", "", "ts", ""],
     ["", "", "", "", "", ""],
-    ["", "", "15", "", "", ""]
+    ["", "", "15", "", "dl", ""],
+    ["", "", "", "ts", "", ""],
+    ["", "dw", "", "", "", "10"],
+    ["", "", "", "tw", "", ""]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
 # We utilize a greedy approach
