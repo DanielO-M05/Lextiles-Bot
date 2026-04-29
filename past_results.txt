@@ -34,5 +34,28 @@
     501
     16th place
 
-11-23-2025
-    512
+--update--
+
+4-26-2026
+    Bot score: 634
+    Bot placement: 7th place
+    Winner score: 997
+    Board: (in vids)
+
+4-27-2026
+    Bot score: 1574
+    Bot placement: 1st place
+    Runner-up score: 1251
+
+4-28-2026
+    Bot score: 738
+    Bot placement: 1st place
+    Runner-up score: 721
+
+4-29-2026
+    Bot score: 1216
+    1st place (tentative)
+
+4-30-2026
+    Bot score: 
+    Bot placement:

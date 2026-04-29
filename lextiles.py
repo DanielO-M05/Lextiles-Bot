@@ -5,6 +5,7 @@ Author: Daniel Otto-Manzano
 
 from english_prefix_trie import is_prefix, is_word
 import time
+from solver import monte_carlo_move
 
 from board import Board
 
@@ -15,30 +16,29 @@ STR_TIME = .3
 # The minimum length for a valid word
 MIN_WORD_LENGTH = 3
 
-# TODO: these scores are not fully updated, I don't know all of their values
 scores = {
     "a": 2, "b": 6, "c": 7, "d": 5, "e": 2, "f": 10, "g": 5,
     "h": 10, "i": 2, "j": 16, "k": 14, "l": 3, "m": 8, "n": 2,
-    "o": 2, "p": 9, "q": -1, "r": 2, "s": 4, "t": 3, "u": 2,
-    "v": 12, "w": 12, "x": -1, "y": 12, "z": 20
+    "o": 2, "p": 9, "q": 22, "r": 2, "s": 4, "t": 3, "u": 2,
+    "v": 12, "w": 12, "x": 18, "y": 12, "z": 20
 }
 
 letters = [
-    ["k", "p", "d", "c", "s", "s"],
-    ["p", "e", "h", "s", "t", "n"],
-    ["o", "i", "d", "e", "d", "e"],
-    ["t", "l", "a", "i", "a", "c"],
-    ["t", "c", "s", "d", "c", "a"],
-    ["o", "n", "l", "a", "n", "r"]
+    ["d", "e", "r", "i", "n", "t"],
+    ["o", "o", "t", "a", "s", "u"],
+    ["l", "f", "w", "a", "l", "x"],
+    ["a", "r", "k", "l", "f", "o"],
+    ["d", "w", "n", "h", "u", "d"],
+    ["l", "e", "t", "g", "t", "p"]
 ] # 6 by 6 grid of strings, either "" or the letter in the cell
 
 powerups = [
     ["", "", "", "", "", ""],
     ["", "15", "", "", "", ""],
     ["", "", "", "", "", "ds"],
-    ["", "", "tl", "", "", ""],
-    ["", "", "", "ts", "", ""],
-    ["", "", "5", "", "", ""]
+    ["", "", "ts", "", "", ""],
+    ["", "", "", "10", "", ""],
+    ["", "", "tl", "", "", ""]
 ] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
 
 # We utilize a greedy approach
@@ -67,7 +67,9 @@ def talk(board):
     while True:
 
         board.grid_print(board.letters) # TODO I don't like this
-        swap, coords = board.best_move_with_swap()
+        # swap, coords = board.best_move_with_swap()
+        swap, coords = monte_carlo_move(board)
+
         if coords == []: break # No more words left
 
         print("Score: " + str(total_score))
