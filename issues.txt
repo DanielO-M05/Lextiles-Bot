@@ -1,0 +1,46 @@
+MAKE SEARCH SPACE SIZE ESTIMATION
+
+For greedy, start by checking top 1 branch, but then once num letters is less than say 18 (out of 36), start checking 2 branches (all the way down)
+    - Smaller performance hit but potentially small optimization for ending moves
+
+Organize the solvers so that all solvers can be run one after the other and compared
+
+Generate a corpus of boards to test out different solvers
+    - With some basic rules about word frequency and an estimate about powerup placement, we can generate boards
+    - Then, we can run the solvers on say 20 boards (which may take 30 minutes or something) and then find which performs best on average
+        - Because this would be a lengthy process, do this after tuning stuff like MCTS right?
+
+How to incorporate consideration for hidden swaps?
+    - The term "hidden swap" refers to the technique where a swap occurs, then a word is played that does not use the swap.
+        The swapped letters are later important for another word down the line (often the next word).
+        This seems like a kind of graph manipulation, but the utility of modeling this as a graph problem is not immediately obvious to me
+    - Maybe, for MCTS, always consider the best word with identity swap as one of the 10 branches?
+        Though since hidden swaps are intentional, this likely wouldn't work.
+        Unless, we require both and identity swap and at least one rollout to include the greedy next word.
+        But, this still doesn't really work, because for hidden swaps to work, not only does the second word need to be intentional, but also the setup word
+
+Hyper parameter tuning for MCTS?
+
+Include human intution somehow? (prob infeasible)
+
+Neural Network?
+    - wouldn't work right?
+
+AI model for score maximization?
+    - Model generated heuristics??
+    - Consider a model that takes in the board state (letters + powerups) as input and returns a word as output.
+        Is this possible? Because it must return a valid word, not a value being put into a loss function.
+        We could try feature engineering (XGBoost? (idk what that is)). For example, having a feature that is (covered powerups)/(total powerups)
+        We could feed other heuristics into the model too, and then it could weight it accordingly.
+        Issue is, I don't know how to constrain the output to just a word, or train the model.
+        Maybe training could be something like:
+            - Let the model play through an entire game. 
+            - Generally speaking, the loss function could just be 3000 - score. 
+                - 3000 is arbitrary, chosen because it's likely impossible to get a score this high. Throw an error if loss is negative.
+            - If the score at the end is less than greedy, penalize even more?
+    - How is score maximization done generally
+
+Could there be a feature that tries to access lextiles.com, presses the right buttons, takes some photos, and then uses that info to read?
+
+Make a setting for whether you want to have automatic or have the "enter to continue"
+

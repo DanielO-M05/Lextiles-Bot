@@ -1,0 +1,20 @@
+Outline
+- Background
+    - What is Lextiles
+- Motivation and Problem Analysis
+    - Why make a solver?
+    - What constitutes success?
+    - Can we do brute force?
+        - Write code to estimate search space and benchmark the times, showing that it wouldn't work
+    - Solving Techniques and Potential Heuristics
+        - Hidden swap technique
+        - Powerups covered heuristic
+- Process
+    - Initial game simulation and prompting solver with greedy
+    - Getting the word list
+    - Monte Carlo Tree Search (word list was needed for this)
+    - Future
+- Results
+    - Use real data examples and generated data examples
+- Conclusion
+    - Flex on 'em
