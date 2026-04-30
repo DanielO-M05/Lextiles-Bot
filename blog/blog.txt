@@ -21,3 +21,5 @@ Outline
     - Use real data examples and generated data examples
 - Conclusion
     - Flex on 'em
+
+JUST START THIS, BREVITY IS THE SOUL OF WIT
