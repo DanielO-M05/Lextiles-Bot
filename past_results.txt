@@ -54,8 +54,15 @@
 
 4-29-2026
     Bot score: 1216
-    1st place (tentative)
+    Bot placement: 1st place
+    Runner-up score: 1088
 
 4-30-2026
-    Bot score: 
-    Bot placement:
+    Bot score: 2109
+    Bot placement:1st place (tentative)
+    Runner-up score: 1840 (tentative)
+
+5-1-2026
+    Bot score: 2109
+    Bot placement:1st place (tentative)
+    Runner-up score: 1840 (tentative)

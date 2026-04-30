@@ -1,13 +1,12 @@
-'''
+"""
 A Lextiles Solver
 Author: Daniel Otto-Manzano
-'''
-
+"""
 from english_prefix_trie import is_prefix, is_word
 import time
-from solver import monte_carlo_move
-
+from solver_mcts import GreedySolver, MCTSSolver
 from board import Board
+from search_space import estimate_search_space
 
 # .07 and 7 are pretty good times, speeding up for debugging
 CHAR_TIME = .03
@@ -24,95 +23,106 @@ scores = {
 }
 
 letters = [
-    ["d", "e", "r", "i", "n", "t"],
-    ["o", "o", "t", "a", "s", "u"],
-    ["l", "f", "w", "a", "l", "x"],
-    ["a", "r", "k", "l", "f", "o"],
-    ["d", "w", "n", "h", "u", "d"],
-    ["l", "e", "t", "g", "t", "p"]
-] # 6 by 6 grid of strings, either "" or the letter in the cell
+    ["o", "t", "g", "h", "t", "y"],
+    ["n", "i", "u", "n", "c", "r"],
+    ["s", "v", "g", "l", "c", "q"],
+    ["o", "a", "i", "a", "h", "a"],
+    ["o", "s", "f", "m", "c", "i"],
+    ["i", "n", "e", "i", "n", "e"]
+]
 
 powerups = [
     ["", "", "", "", "", ""],
-    ["", "15", "", "", "", ""],
-    ["", "", "", "", "", "ds"],
-    ["", "", "ts", "", "", ""],
-    ["", "", "", "10", "", ""],
-    ["", "", "tl", "", "", ""]
-] # 6 by 6 grid of strings, either "" or the power up in the cell, eg "DS", "TL"
+    ["", "", "", "", "", ""],
+    ["", "", "ds", "", "", ""],
+    ["", "", "", "ts", "", "15"],
+    ["", "", "tw", "", "10", ""],
+    ["", "", "", "dl", "", ""]
+]
 
-# We utilize a greedy approach
-# First, we find the best possible word on the board, with no swaps
-    # Note this is **not** guaranteed to find the best word, it uses heuristics to reduce the search space
-    # It's not an easy calculation, but I want to say that brute force has many millions of possible paths
-    # This is reduced because not all paths are words, but either way it still takes too long
-
-def talk(board):
+def talk(board, solver, verbose=True):
     """Runs the program! Helps you solve the puzzle.
 
     Args:
-        None: uses global state
+        board (Board): The board to solve.
+        solver (SolverBase): The solver to use.
+        verbose (bool): If True, uses typewriter printing and prompts for
+                        input between moves. If False, prints moves
+                        automatically without pausing.
 
     Returns:
-        None: prints to terminal
+        int: The total score achieved.
     """
-    typewrite_print("Hello, and welcome to the Lextiles Bot interface!")
-    typewrite_print("It appears that I've already been given the board state.")
-    typewrite_print("Let's go!")
+    def out(s):
+        """Print a line, typewriter-style if verbose, plain if not."""
+        if verbose:
+            typewrite_print(s)
+        else:
+            print(s)
+
+    out("Hello, and welcome to the Lextiles Bot interface!")
+    out("It appears that I've already been given the board state.")
+    out("Let's go!")
     print()
 
-    coords = []
     total_score = 0
+    move_number = 1
 
     while True:
+        board.grid_print(board.letters)
+        swap, coords = solver.choose_move(board, verbose=verbose)
 
-        board.grid_print(board.letters) # TODO I don't like this
-        # swap, coords = board.best_move_with_swap()
-        swap, coords = monte_carlo_move(board)
+        if coords == []:
+            break
 
-        if coords == []: break # No more words left
+        word = board.word_from_coords(coords, swap=swap)
+        move_score = board.score(coords, swap=swap)
 
-        print("Score: " + str(total_score))
-        print("Coords " + str(coords))
+        print(f"Move {move_number} | Running score: {total_score}")
+        print(f"Coords: {coords}")
 
         if swap:
             swap_coord1, swap_coord2 = swap
-            print("Swap coords are " + str(swap_coord1) + " and " + str(swap_coord2))        
-            typewrite_print("Swap " + board.word_from_coords([swap_coord1]) + " at coordinate " + str(swap_coord1) + " with " 
-                            + board.word_from_coords([swap_coord2]) + " at coordinate " + str(swap_coord2))
-            
-        typewrite_print("Play " + board.word_from_coords(coords, swap=swap) + " for a score of " + str(board.score(coords, swap=swap)) + ".")
+            out(f"Swap {board.word_from_coords([swap_coord1])} at {swap_coord1}"
+                f" with {board.word_from_coords([swap_coord2])} at {swap_coord2}")
+
+        out(f"Play '{word}' for a score of {move_score}.")
         print()
 
-        ans = input("Press enter to continue. ").strip().lower()
+        if verbose:
+            input("Press enter to continue. ").strip().lower()
 
-        if swap: board.swaps_left -= 1 # TODO change to setter method
-
-        total_score += board.score(coords, swap=swap)
+        if swap:
+            board.swaps_left -= 1  # TODO change to setter method
+        total_score += move_score
         board.update_board(coords, swap=swap)
+        move_number += 1
 
-    typewrite_print("I couldn't find any words with this board.")
-    typewrite_print("Congrats! We found a solution worth " + str(total_score) + " points!")
-    typewrite_print("Ciao!")
-      
+    out(f"I couldn't find any words with this board.")
+    out(f"Congrats! We found a solution worth {total_score} points!")
+    if verbose:
+        out("Ciao!")
+
+    return total_score
+
+
 def typewrite_print(str, char_time=CHAR_TIME, str_time=STR_TIME):
-    """Prints to the screen with delay between characters
+    """Prints to the screen with delay between characters.
 
     Args:
-        str (str): The string to be printed
-        char_time, optional (float): The delay between characters
-        str_time, optional (float): The delay after printing
-
-    Returns:
-        None: Prints to the terminal
+        str (str): The string to be printed.
+        char_time (float): The delay between characters.
+        str_time (float): The delay after printing.
     """
     for char in str:
         print(char, end="", flush=True)
         time.sleep(char_time)
-
-    time.sleep(str_time) # Pause between statements
+    time.sleep(str_time)
     print()
 
+
+solver = MCTSSolver(n_candidates=10, n_rollouts=50)
 board = Board(letters, powerups, scores, 3, MIN_WORD_LENGTH)
 
-talk(board)
+# estimate_search_space(board, samples_per_level=5)
+talk(board, solver, verbose=False)
