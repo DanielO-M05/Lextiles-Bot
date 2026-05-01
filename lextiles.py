@@ -23,21 +23,21 @@ scores = {
 }
 
 letters = [
-    ["o", "t", "g", "h", "t", "y"],
-    ["n", "i", "u", "n", "c", "r"],
-    ["s", "v", "g", "l", "c", "q"],
-    ["o", "a", "i", "a", "h", "a"],
-    ["o", "s", "f", "m", "c", "i"],
-    ["i", "n", "e", "i", "n", "e"]
+    ["m", "d", "n", "a", "n", "o"],
+    ["e", "a", "m", "e", "m", "f"],
+    ["a", "m", "k", "n", "a", "f"],
+    ["e", "e", "r", "o", "t", "a"],
+    ["t", "r", "l", "t", "w", "t"],
+    ["l", "d", "s", "g", "a", "c"]
 ]
 
 powerups = [
     ["", "", "", "", "", ""],
+    ["", "ds", "", "", "", ""],
+    ["", "", "", "tl", "", "5"],
+    ["", "", "", "", "ts", ""],
     ["", "", "", "", "", ""],
-    ["", "", "ds", "", "", ""],
-    ["", "", "", "ts", "", "15"],
-    ["", "", "tw", "", "10", ""],
-    ["", "", "", "dl", "", ""]
+    ["", "", "dw", "", "", "dl"]
 ]
 
 def talk(board, solver, verbose=True):
@@ -125,4 +125,4 @@ solver = MCTSSolver(n_candidates=10, n_rollouts=50)
 board = Board(letters, powerups, scores, 3, MIN_WORD_LENGTH)
 
 # estimate_search_space(board, samples_per_level=5)
-talk(board, solver, verbose=False)
+talk(board, solver, verbose=True)

@@ -64,5 +64,10 @@
 
 5-1-2026
     Bot score: 2109
-    Bot placement:1st place (tentative)
-    Runner-up score: 1840 (tentative)
+    Bot placement: 1st place 
+    Runner-up score: 2027 
+
+5-2-2026
+    Bot score: 748
+    Bot placement: 1st place (tentative) 
+    Runner-up score: 725 (tentative)
