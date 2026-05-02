@@ -6,6 +6,10 @@ class Coordinate:
     row: int
     col: int
 
+    def __post_init__(self):
+        if self.row is None or self.col is None:
+            raise ValueError("row and col must be provided")
+
     def __iter__(self):
         """Allow unpacking like a tuple: row, col = coord"""
         yield self.row

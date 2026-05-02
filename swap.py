@@ -6,6 +6,14 @@ from typing import Optional, Tuple
 class Swap:
     coords: Optional[Tuple[Coordinate, Coordinate]] = None
 
+    def __post_init__(self):
+        if self.coords is not None:
+            if not (isinstance(self.coords, tuple) and len(self.coords) == 2):
+                raise ValueError("coords must be a tuple of two Coordinates")
+            a, b = self.coords
+            if not all(isinstance(x, Coordinate) for x in (a, b)):
+                raise TypeError("coords must contain Coordinate objects")
+
     def __bool__(self):
         return self.coords is not None
     
